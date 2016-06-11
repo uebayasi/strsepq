@@ -42,6 +42,10 @@ strsepq(char **stringp, const char *delim, const char quote)
 			case DELIM:
 				break;
 			case QUOTE:
+				/*
+                                 * Start of a quoted string; only start of
+                                 * token can be start of a quoted string.
+				 */
 				state = INQUOTE;
 				*s++ = '\0';
 				token = s;
@@ -80,6 +84,9 @@ strsepq(char **stringp, const char *delim, const char quote)
 	if (*s == '\0')
 		*stringp = NULL;
 	else if (token != NULL) {
+		/*
+                 * End of a quoted token; assume next char is a delim.
+		 */
 		*s = '\0';
 		*stringp = s + 1;
 	}
@@ -96,6 +103,7 @@ strsepq(char **stringp, const char *delim, const char quote)
 
 const char *tests[] = {
 	"a",
+	" ",
 	"\"",
 	"\"\"",
 	"a\"",
@@ -104,6 +112,7 @@ const char *tests[] = {
 	"aa bb cc",
 	"\"aa bb cc\"",
 	"aa \"bb\" cc",
+        "aa \"bb\"cc",  /* XXX 'c' after '"' is ignored as a delim */
 	"a a\"bb\"c c",
 	"a a\"b b\"c c",
 };
@@ -115,11 +124,11 @@ main(int ac, char *av[])
 	int i;
 
 	for (i = 0; i < nitems(tests); i++) {
-		printf("INPUT: %s\n", tests[i]);
+		printf("INPUT: '%s'\n", tests[i]);
 		strlcpy(buf, tests[i], sizeof(buf));
 		p = buf;
 		while ((s = strsepq(&p, " \t", '"')) != NULL)
-			printf(" TOKEN: %s\n", s);
+			printf(" TOKEN: '%s'\n", s);
 	}
 	return 0;
 }
