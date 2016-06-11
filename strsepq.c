@@ -20,7 +20,7 @@ char *
 strsepq(char **stringp, const char *delim, const char quote)
 {
 	char *s, *token = NULL;
-	enum { NONE, INQUOTE, INTOKEN } state = NONE;
+	enum { OUT, INQUOTE, INTOKEN } state = OUT;
 
 	if (*stringp == NULL)
 		return NULL;
@@ -32,19 +32,19 @@ strsepq(char **stringp, const char *delim, const char quote)
 			if (*dp == c)
 				break;
 
-		enum { DELIM, QUOTE, MISC } input =
+		enum { DELIM, QUOTE, ANY } input =
 		    (*dp != '\0') ? DELIM :
-		    (c == quote) ? QUOTE : MISC;
+		    (c == quote) ? QUOTE : ANY;
 
 		switch (state) {
-		case NONE:
+		case OUT:
 			switch (input) {
 			case QUOTE:
 				state = INQUOTE;
 				*s++ = '\0';
 				token = s;
 				break;
-			case MISC:
+			case ANY:
 				state = INTOKEN;
 				token = s;
 				break;
@@ -53,18 +53,18 @@ strsepq(char **stringp, const char *delim, const char quote)
 		case INQUOTE:
 			switch (input) {
 			case QUOTE:
-				state = NONE;
+				state = OUT;
 				*s++ = '\0';
 				break;
 			}
 		case INTOKEN:
 			switch (input) {
 			case DELIM:
-				state = NONE;
+				state = OUT;
 				break;
 			}
 		}
-		if (state == NONE && token != NULL)
+		if (state == OUT && token != NULL)
 			break;
 	}
 	if (*s == '\0')
