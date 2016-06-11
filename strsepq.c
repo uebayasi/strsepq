@@ -39,6 +39,8 @@ strsepq(char **stringp, const char *delim, const char quote)
 		switch (state) {
 		case OUT:
 			switch (input) {
+			case DELIM:
+				break;
 			case QUOTE:
 				state = INQUOTE;
 				*s++ = '\0';
@@ -52,15 +54,23 @@ strsepq(char **stringp, const char *delim, const char quote)
 			break;
 		case INQUOTE:
 			switch (input) {
+			case DELIM:
+				break;
 			case QUOTE:
 				state = OUT;
 				*s++ = '\0';
+				break;
+			case ANY:
 				break;
 			}
 		case INTOKEN:
 			switch (input) {
 			case DELIM:
 				state = OUT;
+				break;
+			case QUOTE:
+				break;
+			case ANY:
 				break;
 			}
 		}
