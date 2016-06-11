@@ -78,6 +78,7 @@ strsepq(char **stringp, const char *delim, const char quote)
 
 #ifdef TEST
 #include <stdio.h>
+#include <string.h>
 
 #ifndef nitems
 #define nitems(x) (sizeof(x)/sizeof(x[0]))
