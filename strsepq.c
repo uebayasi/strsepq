@@ -88,14 +88,14 @@ const char *tests[] = {
 	"a",
 	"\"",
 	"\"\"",
+	"a\"",
+	"a \"",
 	"aabbcc",
 	"aa bb cc",
 	"\"aa bb cc\"",
 	"aa \"bb\" cc",
 	"a a\"bb\"c c",
 	"a a\"b b\"c c",
-	"aabbcc\"",
-	"aabbcc \"",
 };
 
 int
