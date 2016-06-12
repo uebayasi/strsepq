@@ -95,8 +95,8 @@ strsepq(char **stringp, const char *delim, const char quote)
 	if (*s == '\0')
 		*stringp = NULL;
 	else if (token != NULL) {
-		*s = '\0';
-		*stringp = s + 1;
+		*s++ = '\0';
+		*stringp = s;
 	}
 	return token;
 }
@@ -112,10 +112,14 @@ strsepq(char **stringp, const char *delim, const char quote)
 const char *tests[] = {
 	"a",
 	" ",
+	" a",
+	"a ",
 	"\"",
 	"\"\"",
 	"a\"",
 	"a \"",
+	"\"a",
+	"\" a",
 	"aabbcc",
 	"aa bb cc",
 	"\"aa bb cc\"",
