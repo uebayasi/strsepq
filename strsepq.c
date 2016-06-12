@@ -28,6 +28,7 @@ strsepq(char **stringp, const char *delim, const char quote)
 		const int c = *s;
 		const char *dp;
 
+		/* Open-coded strchr(). */
 		for (dp = delim; *dp != '\0'; dp++)
 			if (*dp == c)
 				break;
@@ -43,14 +44,17 @@ strsepq(char **stringp, const char *delim, const char quote)
 				break;
 			case QUOTE:
 				/*
-                                 * Start of a quoted string; only start of
-                                 * token can be start of a quoted string.
+				 * Start of a quoted string; only start of a
+				 * token can be start of a quoted string.
 				 */
 				state = INQUOTE;
 				*s++ = '\0';
 				token = s;
 				break;
 			case ANY:
+				/*
+				 * Start of a token.
+				 */
 				state = INTOKEN;
 				token = s;
 				break;
@@ -61,6 +65,10 @@ strsepq(char **stringp, const char *delim, const char quote)
 			case DELIM:
 				break;
 			case QUOTE:
+				/*
+				 * End of a quoted token; assume the next
+				 * char is a delimiter.
+				 */
 				state = OUT;
 				*s++ = '\0';
 				break;
@@ -70,6 +78,9 @@ strsepq(char **stringp, const char *delim, const char quote)
 		case INTOKEN:
 			switch (input) {
 			case DELIM:
+				/*
+				 * End of a token.
+				 */
 				state = OUT;
 				break;
 			case QUOTE:
@@ -84,9 +95,6 @@ strsepq(char **stringp, const char *delim, const char quote)
 	if (*s == '\0')
 		*stringp = NULL;
 	else if (token != NULL) {
-		/*
-                 * End of a quoted token; assume next char is a delim.
-		 */
 		*s = '\0';
 		*stringp = s + 1;
 	}
@@ -112,7 +120,7 @@ const char *tests[] = {
 	"aa bb cc",
 	"\"aa bb cc\"",
 	"aa \"bb\" cc",
-        "aa \"bb\"cc",  /* XXX 'c' after '"' is ignored as a delim */
+	"aa \"bb\"cc",  /* XXX 'c' after '"' is ignored as a delim */
 	"a a\"bb\"c c",
 	"a a\"b b\"c c",
 };
